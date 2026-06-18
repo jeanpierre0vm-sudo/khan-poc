@@ -14,8 +14,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Khan Academy India — PM Screener | Victor Meinert",
-  description: "Project Manager, Content Operations screener submission for Khan Academy India. A fully agentic AI pipeline for video metadata at scale.",
+  title: "Screener Submission - Project Manager, Content Operations",
+  description: "An AI-powered video metadata pipeline built as a screener submission for Khan Academy. Proof of concept by Victor Meinert.",
+  openGraph: {
+    title: "Screener Submission - Project Manager, Content Operations",
+    description: "An AI-powered video metadata pipeline built as a screener submission for Khan Academy. Proof of concept by Victor Meinert.",
+  },
 };
 
 export default function RootLayout({
