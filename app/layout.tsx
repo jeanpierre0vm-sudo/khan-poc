@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Nav from "@/components/Nav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,10 +36,8 @@ export default function RootLayout({
             <header className="border-b border-gray-800 px-8 py-5">
               <div className="max-w-6xl mx-auto flex items-start justify-between">
                 <div>
-                  <p className="text-4xl font-bold tracking-tight text-white">Screener Submission - Project Manager, Content Operations</p>
-                  <div className="mt-2">
-                    <Nav />
-                  </div>
+                  <p className="text-4xl font-bold tracking-tight text-white">Screener Submission - Victor Meinert</p>
+                  <p className="text-2xl text-gray-400">Project Manager - Content Operations</p>
                 </div>
                 <div className="flex flex-col items-end gap-0.5 shrink-0 ml-8">
                   <p className="text-xs text-gray-500">Built by Victor Meinert</p>
