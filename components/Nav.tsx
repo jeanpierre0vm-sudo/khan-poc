@@ -12,25 +12,25 @@ const links = [
 
 export default function Nav() {
   const pathname = usePathname();
-
   return (
     <nav className="flex items-center gap-6">
-        {links.map(({ href, label }) => {
-          const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={`text-sm font-medium tracking-wide transition-colors ${
-                isActive
-                  ? "text-white border-b-2 border-blue-400 pb-0.5"
-                  : "text-gray-400 hover:text-gray-200"
-              }`}
-            >
-              {label}
-            </Link>
-          );
-        })}
+      {links.map(({ href, label }) => {
+        const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
+        return (
+          <Link
+            key={href}
+            href={href}
+            className={
+              "text-sm font-medium tracking-wide transition-colors " +
+              (isActive
+                ? "text-white border-b-2 border-blue-400 pb-0.5"
+                : "text-gray-400 hover:text-gray-200")
+            }
+          >
+            {label}
+          </Link>
+        );
+      })}
     </nav>
   );
 }

@@ -11,9 +11,13 @@ function extractTitle(prop: any): string {
 
 export async function GET() {
   const token = process.env.NOTION_TOKEN;
+
   if (!token) {
+    console.error("[/api/videos] NOTION_TOKEN is not set");
     return Response.json({ error: "NOTION_TOKEN not configured" }, { status: 500 });
   }
+
+  console.log("[/api/videos] NOTION_TOKEN present, querying database:", NOTION_DATABASE_ID);
 
   try {
     const results: any[] = [];
@@ -31,10 +35,12 @@ export async function GET() {
           "Notion-Version": "2022-06-28",
         },
         body: JSON.stringify(body),
+        cache: "no-store",
       });
 
       if (!res.ok) {
         const text = await res.text();
+        console.error(`[/api/videos] Notion API returned ${res.status}:`, text);
         return Response.json(
           { error: `Notion API error: ${res.status}`, detail: text },
           { status: res.status }
@@ -42,6 +48,7 @@ export async function GET() {
       }
 
       const data = await res.json();
+      console.log(`[/api/videos] Received ${data.results?.length ?? 0} pages, has_more: ${data.has_more}`);
 
       for (const page of data.results) {
         const p = page.properties;
@@ -49,6 +56,7 @@ export async function GET() {
           id: page.id,
           videoName: extractTitle(p["Video Name"]),
           title: extractRichText(p["Title"]),
+          description: extractRichText(p["Description"]),
           tags: extractRichText(p["Tags"]),
           timestamps: extractRichText(p["Timestamps"]),
           qaStatus: p["QA Status"]?.select?.name ?? null,
@@ -61,9 +69,11 @@ export async function GET() {
       cursor = data.has_more ? data.next_cursor : undefined;
     } while (cursor);
 
+    console.log(`[/api/videos] Returning ${results.length} total records`);
     return Response.json(results);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("[/api/videos] Caught exception:", message);
     return Response.json({ error: message }, { status: 500 });
   }
 }
