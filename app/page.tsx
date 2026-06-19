@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 const pages = [
   {
@@ -18,7 +21,121 @@ const pages = [
   },
 ];
 
+type Video = {
+  id: string;
+  videoName: string;
+  title: string;
+  tags: string;
+  timestamps: string;
+  qaStatus: string | null;
+  videoUrl: string | null;
+  processingCost: string;
+  duration: string;
+};
+
+function QaBadge({ status }: { status: string | null }) {
+  if (!status) return <span className="text-gray-600 text-xs">—</span>;
+  const styles: Record<string, string> = {
+    Approved: "bg-green-900 text-green-300 border-green-700",
+    Pending: "bg-yellow-900 text-yellow-300 border-yellow-700",
+    Failed: "bg-red-900 text-red-300 border-red-700",
+  };
+  const cls = styles[status] ?? "bg-gray-800 text-gray-400 border-gray-700";
+  return (
+    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${cls}`}>
+      {status}
+    </span>
+  );
+}
+
+function VideoTable({ videos }: { videos: Video[] }) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  return (
+    <div className="border border-gray-800 rounded-xl overflow-hidden">
+      {/* Table header */}
+      <div className="grid grid-cols-[2fr_3fr_1fr_1fr_1fr] gap-4 px-5 py-3 bg-gray-900 border-b border-gray-800 text-xs uppercase tracking-widest text-gray-500">
+        <span>Video Name</span>
+        <span>AI-Generated Title</span>
+        <span>Duration</span>
+        <span>QA Status</span>
+        <span>Cost</span>
+      </div>
+
+      {videos.map((v) => {
+        const isOpen = expanded === v.id;
+        return (
+          <div key={v.id} className="border-b border-gray-800 last:border-0">
+            {/* Row */}
+            <button
+              onClick={() => setExpanded(isOpen ? null : v.id)}
+              className="w-full grid grid-cols-[2fr_3fr_1fr_1fr_1fr] gap-4 px-5 py-4 text-left hover:bg-gray-900 transition-colors items-center"
+            >
+              <span className="text-gray-200 text-sm font-medium truncate">{v.videoName}</span>
+              <span className="text-gray-400 text-sm truncate">{v.title || "—"}</span>
+              <span className="text-gray-500 text-sm">{v.duration || "—"}</span>
+              <span><QaBadge status={v.qaStatus} /></span>
+              <span className="text-gray-500 text-sm flex items-center justify-between">
+                {v.processingCost || "—"}
+                <span className="text-gray-700 ml-2">{isOpen ? "▲" : "▼"}</span>
+              </span>
+            </button>
+
+            {/* Expanded detail */}
+            {isOpen && (
+              <div className="px-5 pb-5 bg-gray-900 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">Timestamps</p>
+                  <pre className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap font-mono">
+                    {v.timestamps || "No timestamps available."}
+                  </pre>
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">Tags</p>
+                  <div className="flex flex-wrap gap-2">
+                    {v.tags
+                      ? v.tags.split(",").map((tag) => (
+                          <span
+                            key={tag}
+                            className="bg-gray-800 text-gray-300 text-xs px-3 py-1 rounded-full border border-gray-700"
+                          >
+                            {tag.trim()}
+                          </span>
+                        ))
+                      : <span className="text-gray-600 text-sm">No tags available.</span>
+                    }
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function HomePage() {
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/videos")
+      .then((res) => {
+        if (!res.ok) throw new Error(`API error: ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        setVideos(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <main className="min-h-screen bg-gray-950 text-white font-sans">
 
@@ -60,7 +177,7 @@ export default function HomePage() {
       </section>
 
       {/* Navigation Cards */}
-      <section className="px-8 py-14">
+      <section className="px-8 py-14 border-b border-gray-800">
         <div className="max-w-6xl mx-auto">
           <p className="text-xs uppercase tracking-widest text-gray-500 mb-10">What You&apos;ll Find Here</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -80,6 +197,30 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Video Metadata Repository */}
+      <section className="px-8 py-14 border-b border-gray-800">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">Video Metadata Repository</p>
+          <h2 className="text-2xl font-bold text-white mb-2">Batch Output — 10 Videos</h2>
+          <p className="text-gray-400 text-sm mb-8">AI-generated metadata for each video, pulled live from Notion. Click any row to expand timestamps and tags.</p>
+
+          {loading && (
+            <div className="flex items-center gap-3 text-gray-500 py-12">
+              <div className="w-4 h-4 border-2 border-gray-600 border-t-blue-400 rounded-full animate-spin" />
+              <span className="text-sm">Loading from Notion...</span>
+            </div>
+          )}
+
+          {error && (
+            <div className="bg-red-950 border border-red-800 rounded-xl px-5 py-4 text-red-300 text-sm">
+              Failed to load videos: {error}
+            </div>
+          )}
+
+          {!loading && !error && <VideoTable videos={videos} />}
         </div>
       </section>
 
