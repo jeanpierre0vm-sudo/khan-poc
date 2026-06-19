@@ -248,6 +248,7 @@ export default function HomePage() {
             <div>
               <p className="text-3xl font-bold text-blue-400">5</p>
               <p className="text-sm text-gray-500 mt-1">Metadata outputs generated</p>
+              <p className="text-sm text-gray-500 mt-1">(see data below)</p>
             </div>
             <div>
               <p className="text-3xl font-bold text-blue-400">$0.02</p>
