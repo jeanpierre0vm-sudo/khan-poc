@@ -29,6 +29,23 @@ export default function HomePage() {
           <h1 className="text-5xl font-bold leading-tight tracking-tight max-w-3xl">
             Project Manager, Content Operations
           </h1>
+          <div className="mt-6 flex flex-col gap-1">
+            <p className="text-base text-gray-300 font-semibold">Victor Meinert</p>
+            <a
+              href="mailto:jeanpierre0vm@gmail.com"
+              className="text-base text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              jeanpierre0vm@gmail.com
+            </a>
+            <a
+              href="https://www.linkedin.com/in/victormeinert"
+              className="text-base text-blue-400 hover:text-blue-300 transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              linkedin.com/in/victormeinert
+            </a>
+          </div>
         </div>
       </section>
 
