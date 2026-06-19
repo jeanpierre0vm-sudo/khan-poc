@@ -1,3 +1,5 @@
+export const revalidate = 60;
+
 const NOTION_DATABASE_ID = "d0d059c7-724f-4f28-aa41-e6eefd38c12b";
 const NOTION_API_URL = `https://api.notion.com/v1/databases/${NOTION_DATABASE_ID}/query`;
 
